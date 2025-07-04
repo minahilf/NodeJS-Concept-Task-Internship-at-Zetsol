@@ -81,3 +81,125 @@ Common Methods:
 5. path.resolve()	Full absolute path return karta hai
 
 
+<!-- Built‑in Networking (`http`/`https`, `net`, `dgram`) -->
+ 
+Netowrking modules jo hamare node js ko internet se connect krwate hen
+
+http module: normal web server banane deta hai jaise browser me request bhejna aur server uska reply de.
+const http = require("http");
+
+https module: secure version of http same as http but ssl certificate hota h secure connection k lye 📌 Needs SSL setup (key + cert) run nh krega real ssl k bina
+
+net module: tcp connection k lye hot h reliable data transfer jese chat app, file transfer
+const net = require("net"); Isme ek socket bana ke client se message send/receive kar sakte.
+You can connect to this using a TCP client like Telnet or netcat.
+
+dgram module: UDP = used in games, voice chat (less reliable but fast)
+const dgram = require("dgram"); It listens for incoming UDP messages on port 5000.
+
+http = basic website server
+https = secure website server
+net = TCP communication (chat)
+dgram = UDP communication (fast games ya voice apps)
+
+<!--  Event‑Driven Design (`EventEmitter`) -->
+Event-driven mtlb koi kaam tab chalao jab koi “event” ho  jaise click, message, read complete, etc.
+event emitter ek class hoti he node js me jo allow krti h k events create hon or us pr react ho jese frontend pe button click hona ek event h to yhn bh hm custom event define krskte hen or jb woh fire ho to code chla skte
+
+why: Streams, file read/write, socket, timers — sab me Node.js internally EventEmitter use karta hai
+
+Common Methods:
+1. on(event, fun)  jb event aye to function chle
+2. .emit(event, data) event trigger hota he
+3. .once(event, fn)  jb ek br chle
+4. .off(event, fn) or removeListner()  event hata dena
+5. .listenerCount() kitne listeners lage hue
+
+STeps:
+1. EventEmitter ek class hai jo tumhe events banane deti hai.
+2. Pehle tum us class ka object banaogi.
+3. Phir .on() se bataogi ke jab ye event ho to kya karna hai.
+4. Aur jab tum .emit() karogi to wo event chalega.
+
+<!-- Process Management & Environment (`Signals`, `process.env`) -->
+
+jb hamara program run hota h to woh ek process hota he or Node.js tumhe us process ko control karne aur uske environment se interact karne ke tools deta hai jaise variables, signals, exit codes, etc.
+
+Why?
+1. kabhi kabhi program ke behavior ko runtime pe change karna hota hai (without changing code)
+2. Logs ka level, secrets, ports sab environment variables me store karte hain
+3. Signals se process ko exit, restart, clean-up kara skte
+
+Common things:
+1. process.env: ye obj hota h jis me project k env var save hote hen
+console.log(process.env.PORT);
+
+2. process.exit([code]): tmhara app manually close hojae
+Example: 
+
+if (!process.env.SECRET) {
+  console.log("Missing secret, exiting...");
+  process.exit(1); // 1 = error
+}
+
+3. process.on('exit'): jb process close hone wala ho to us time kch kro
+Example:
+process.on("exit", (code) => {
+  console.log(`Process exiting with code: ${code}`);
+});
+
+<!-- Error Handling & Debugging -->
+Error handling means program me jo bh error aye usko catch krke program ko crash hone se bachana
+Debugging: jb code me error dhundte usko bolte debugging
+
+common methods and techniques:
+1.  try { } catch(err) { }  normal error handle krte try me jo part sahi h woh chle catch me jo error agya tb chle
+2. .catch with promises  promises me koi error ajaye usko catch krna
+3. process.on("uncaughtException")	jo error catch na horha ho usko bh pkrlo
+4. console.log/ console.error debug print krne k lye
+5. debugger: code ko pause krne k ly
+6. node inspect: terminal se debug krna
+
+
+<!-- Security Fundamentals (Input Validation, TLS Basics) -->
+
+security fundamentals woh btate hen k kese hm apne node js k project ko secure bana skte hen specially webapps jhn se user input ata h ya data send ya receive hota he
+
+why?
+1. Hackers user input se malicious code bhej sakte hain (e.g. SQL Injection, XSS)
+2. App ka data safe hona chahiye specially passwords, tokens
+3. Internet pe data bhejna ho to TLS zaroori hota hai (for HTTPS)
+
+A. Input Validation: jb user input bhjta h to check krna he k required format missing na ho , invalid script na ho or correct format me ho Use libraries like: express-validator , Joi , Manual checks (if/else)
+
+Example:
+if (!email.includes("@")) {
+  return res.status(400).send("Invalid email");
+}
+
+B. TLS Basics HTTPS: TLS means transport layer security ye server or client k data ko encrypt krta he jb hm browser me https:// ka use krte hen to woh tls hi use krha hota he
+
+TLS se man in the middle attack s protection milti he, data snooping se, login info leak hone se
+node js me https module use hota h with ssl certificate
+
+
+<!-- Performance Awareness (Profiling; Blocking vs. Non‑Blocking) -->
+ye batata h k node js ka project fast chlrha h ya slow or kis code ki waja se slow chl rha hota h is me 2 cheezen hoti hen profiling (code analysis) or blocking vs non blocking (code behavior)
+
+why?
+1. node js single threaded hota he agr 1 kaam slow ho to poora app rukskta he
+2. Tumhe samajhna chahiye kaunsa code fast hai (non-blocking) aur kaunsa app ko freeze kar raha hai (blocking)
+
+A. BLOCKING VS NON BLOCKING
+blocking: jb ek kaam complete hone tk agla code ruk jata he it is sync
+non blocking: jb kaam bg me chlta rhe or agla code foran chl jaye it is async
+
+B. PROFILING
+Ye technique batati hai ke kaha pe time lag raha hai, konsa function slow hai, memory usage kaisi hai
+
+Tools:
+
+1. --inspect flag with Chrome DevTools
+2. console.time() & console.timeEnd()
+3. Profiling tools like clinic.js, v8-profiler-next
+
